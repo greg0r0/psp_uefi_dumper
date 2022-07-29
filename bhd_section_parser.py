@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from email.mime import base
 import sys
 import os
 import zlib
