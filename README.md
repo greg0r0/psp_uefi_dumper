@@ -1,6 +1,6 @@
 # PSP UEFI Parser&Dumper
 
-Somedays here will be normal script. Now here only PoC for dumping $BHD section.
+Somedays here will be normal script. Right now here only PoC for dumping $BHD (BIOS) section.
 
 # Use:
 
