@@ -37,6 +37,7 @@ if firmware[0x20000:0x20004] == b"\xaa\x55\xaa\x55":
 else:
     table_offset = firmware.find(magic_string)+4
     if table_offset <4 :
+        #TODO: Add "FET" signature
         print("[-] Not found signature")
         sys.exit(-1)
     #TODO: Research: can offset be lesser than 0x20000
@@ -97,9 +98,9 @@ for bhd_address in bhd_addresses:
         bhd_entry = firmware[bhd_sections_offset + i*6*4:bhd_sections_offset+(i+1)*6*4]
         bhd_entry_type = binToInt(bhd_entry[0:4])
         bhd_entry_len  = binToInt(bhd_entry[4:8])
-        bhd_entry_address = binToInt(bhd_entry[8:12]) + base_address
+        bhd_entry_address = sanitizeAddress(binToInt(bhd_entry[8:12]), base_address)
         bhd_entry_undifined_blob = bhd_entry[12:24]
-
+        
         print(f"\t\t[>] BHD_Type={hex(bhd_entry_type)}\n\t\tBHD_entry_len={bhd_entry_len} ({hex(bhd_entry_len)})\n\t\tBHD_entry_address={hex(bhd_entry_address)}\n\t\tBHD_Enrty_Undf_blob={bhd_entry_undifined_blob}")
 
         # 3) dump it to FS
