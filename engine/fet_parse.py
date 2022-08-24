@@ -52,8 +52,8 @@ if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:
         print(f"[-] Please use: {sys.argv[0]} <firmware file>")
+        sys.exit(-1)
     data = utils.read_file(sys.argv[1])
-
     for fet in get_next_FET(firmware=data):
         print(f"[+] FET foind at {hex(fet.fet_location)}")
         print(fet.hexdump())
