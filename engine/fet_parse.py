@@ -41,6 +41,13 @@ class FET:
     def hexdump(self):
         return utils.hexdump(self.raw_table)
 
+    def iterate_over(self, cookie: str, firmware: bytes()) -> int:
+        if len(cookie) != 4:
+            raise Exception("Bad cookie len. Must be 4 bytes")
+        for address in self.modules_offsets:
+            if firmware[address:address+4] == cookie:
+                yield address
+
 
 def get_next_FET(firmware: bytes()) -> FET:
     ''' Method for iteratin over FET's. there are usually 1-2 tables in the firmware '''
