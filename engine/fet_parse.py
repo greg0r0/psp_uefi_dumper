@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import re
 
 import types_local as types
@@ -34,6 +34,7 @@ class FET:
 
         self.magic_end = binblob[pad_start+iter_addr*4:pad_start+4*(iter_addr+1)]
 
+        #just self-check
         if not (self.magic_start == b'\xaa\x55\xaa\x55' and self.magic_end == b"\x00\x55\xff\xff"):
             print(f"[!] FET at offset {self.fet_location} possible not FET.")
 
@@ -41,16 +42,22 @@ class FET:
         return utils.hexdump(self.raw_table)
 
 
+def get_next_FET(firmware: bytes()) -> FET:
+    ''' Method for iteratin over FET's. there are usually 1-2 tables in the firmware '''
+    for fet in re.finditer(types.re_fet, firmware):
+        yield FET(fet.start(), fet.group())
+
 
 if __name__ == "__main__":
     import sys
+    if len(sys.argv) != 2:
+        print(f"[-] Please use: {sys.argv[0]} <firmware file>")
     data = utils.read_file(sys.argv[1])
 
-    for fet in re.finditer(types.re_fet, data):
-        fet_blob = FET(fet.start(), fet.group())
-        print(f"[+] FET foind at {hex(fet_blob.fet_location)}")
-        print(fet_blob.hexdump())
+    for fet in get_next_FET(firmware=data):
+        print(f"[+] FET foind at {hex(fet.fet_location)}")
+        print(fet.hexdump())
 
-        for addr in fet_blob.modules_offsets:
-            print(utils.hex32_be(addr))
-            print(data[addr:addr+4])
+        for addr in fet.modules_offsets:
+            print(f"{utils.hex32_be(addr)} => {data[addr:addr+4]}")
+        print()
