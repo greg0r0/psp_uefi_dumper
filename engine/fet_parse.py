@@ -10,7 +10,7 @@ class FET:
         self.raw_table = binblob
 
         self.fet_location = offset           # base image offset
-        self.fet_offset   = offset - 0x20000 # seems like 0x020000 offset is some type of standard
+        self.fet_offset   = offset - types.base_offset # seems like 0x020000 offset is some type of standard
 
         self.magic_start  = binblob[0:4]
 
@@ -21,9 +21,19 @@ class FET:
 
         # main part - get all PSP, BHD and Other addresses 
         # here just parsing 4 byte addresses and sanitizing it with FET offset in firmware
-        self.modules_offsets = [ utils.sanitizeAddress( int.from_bytes(binblob[0x10:0x48][i:i+4],'little'), self.fet_offset) for i in range(0,0x38,4)]
+        self.modules_offsets = []
+        
+        pad_start = 0x10
+        iter_addr = 0
 
-        self.magic_end  = binblob[0x48:0x4c]
+        while binblob[pad_start+iter_addr*4:pad_start+4*(iter_addr+1)] != b"\x00\x55\xff\xff":
+            
+            address_new = utils.sanitizeAddress( int.from_bytes(binblob[pad_start+iter_addr*4:pad_start+4*(iter_addr+1)],'little'), self.fet_offset)
+            self.modules_offsets.append(address_new)
+            iter_addr+=1
+
+        self.magic_end = binblob[pad_start+iter_addr*4:pad_start+4*(iter_addr+1)]
+
         if not (self.magic_start == b'\xaa\x55\xaa\x55' and self.magic_end == b"\x00\x55\xff\xff"):
             print(f"[!] FET at offset {self.fet_location} possible not FET.")
 
