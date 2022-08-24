@@ -41,7 +41,8 @@ class FET:
     def hexdump(self):
         return utils.hexdump(self.raw_table)
 
-    def iterate_over(self, cookie: str, firmware: bytes()) -> int:
+    def iterate_over(self, cookie: bytes(), firmware: bytes()) -> int:
+        '''Function for iterating over addresses with specific cookie'''
         if len(cookie) != 4:
             raise Exception("Bad cookie len. Must be 4 bytes")
         for address in self.modules_offsets:
